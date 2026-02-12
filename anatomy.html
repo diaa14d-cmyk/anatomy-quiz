@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار تشريح القلب الشامل</title>
+    <style>
+        :root {
+            --pink-main: #ff85a1;
+            --purple-main: #a29bfe;
+            --bg-color: #fce4ec;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--pink-main), var(--purple-main));
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            direction: rtl;
+        }
+        .quiz-container {
+            background: white;
+            width: 95%;
+            max-width: 650px;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .question-box { direction: ltr; text-align: left; margin-bottom: 20px; }
+        .question-text { font-size: 1.2rem; font-weight: 600; color: #333; margin-bottom: 15px; }
+        .options-grid { display: grid; gap: 10px; }
+        .option-btn {
+            background: #fff;
+            border: 2px solid var(--purple-main);
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: left;
+            font-size: 1rem;
+        }
+        .option-btn:hover { background: var(--bg-color); }
+        .correct { background: #d1fae5 !important; border-color: #10b981 !important; color: #065f46; }
+        .wrong { background: #fee2e2 !important; border-color: #ef4444 !important; color: #991b1b; }
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            direction: rtl;
+            text-align: right;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .next-btn {
+            width: 100%;
+            margin-top: 15px;
+            padding: 12px;
+            border: none;
+            background: #6c5ce7;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            display: none;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <div>السؤال: <span id="q-num">1</span> / 50</div>
+        <div>النتيجة: <span id="score">0</span></div>
+    </div>
+
+    <div id="quiz-area">
+        <div class="question-box">
+            <div id="q-text" class="question-text"></div>
+            <div id="options" class="options-grid"></div>
+        </div>
+        <div id="feedback" class="feedback"></div>
+        <button id="next-btn" class="next-btn" onclick="nextQuestion()">السؤال التالي ➔</button>
+    </div>
+</div>
+
+<script>
+const questions = [
+    {q: "What is the cardiovascular system's definition?", options: ["A network that delivers oxygen and nutrients", "A system for digestion", "A system for breathing only", "A network of nerves"], correct: 0, page: 2, exp: "الجهاز الوعائي القلبي هو شبكة تنقل الأكسجين والمغذيات والهرمونات والفضلات."},
+    {q: "The heart is located between which ribs?", options: ["1st to 4th", "2nd rib to 5th intercostal space", "5th to 10th", "3rd to 7th"], correct: 1, page: 3, exp: "يقع القلب في التجويف الصدري من الضلع الثاني إلى الفراغ الوربي الخامس."},
+    {q: "The apex of the heart points towards the right lung.", options: ["True", "False"], correct: 1, page: 3, exp: "خطأ، قمة القلب (Apex) تتجه قليلاً إلى اليسار."},
+    {q: "Which layer of the heart wall is the thickest and consists of cardiac muscle?", options: ["Epicardium", "Endocardium", "Myocardium", "Pericardium"], correct: 2, page: 4, exp: "طبقة عضلة القلب (Myocardium) هي الطبقة الوسطى والسميكة."},
+    {q: "The double-walled sac enclosing the heart is called:", options: ["Pleura", "Pericardium", "Peritoneum", "Endocardium"], correct: 1, page: 4, exp: "الغشاء المزدوج المحيط بالقلب يسمى التامور (Pericardium)."},
+    {q: "The right atrium receives deoxygenated blood from the body.", options: ["True", "False"], correct: 0, page: 4, exp: "صحيح، يستقبل الأذين الأيمن الدم غير المؤكسج من الجسم."},
+    {q: "Which valve is found between the left atrium and left ventricle?", options: ["Tricuspid valve", "Pulmonary valve", "Mitral (Bicuspid) valve", "Aortic valve"], correct: 2, page: 5, exp: "الصمام التاجي (Mitral) يقع بين الأذين والبطين الأيسر."},
+    {q: "What is the function of heart valves?", options: ["To speed up blood flow", "To ensure one-way blood flow", "To oxygenate blood", "To produce red blood cells"], correct: 1, page: 3, exp: "وظيفة الصمامات هي ضمان تدفق الدم في اتجاه واحد ومنع رجوعه."},
+    {q: "The SA node is often called the pacemaker.", options: ["True", "False"], correct: 0, page: 6, exp: "صحيح، العقدة الجيبية الأذينية هي المنظم لضربات القلب."},
+    {q: "Which vessels carry blood away from the heart?", options: ["Veins", "Arteries", "Capillaries", "Venules"], correct: 1, page: 7, exp: "الشرايين (Arteries) تنقل الدم بعيداً عن القلب."},
+    {q: "Capillaries are the site of gas and nutrient exchange.", options: ["True", "False"], correct: 0, page: 7, exp: "صحيح، الشعيرات الدموية هي مكان التبادل."},
+    {q: "What is the liquid portion of blood called?", options: ["Hemoglobin", "Plasma", "Platelets", "Leukocytes"], correct: 1, page: 8, exp: "البلازما هي المكون السائل للدم وتشكل 55% منه."},
+    {q: "Red blood cells are also known as:", options: ["Leukocytes", "Thrombocytes", "Erythrocytes", "Plasma"], correct: 2, page: 9, exp: "خلايا الدم الحمراء تسمى (Erythrocytes)."},
+    {q: "The lifespan of a red blood cell is about 120 days.", options: ["True", "False"], correct: 0, page: 9, exp: "صحيح، تعيش كرات الدم الحمراء حوالي 120 يوماً."},
+    {q: "White blood cells (Leukocytes) are part of the immune system.", options: ["True", "False"], correct: 0, page: 9, exp: "صحيح، وظيفتها الأساسية هي الدفاع عن الجسم."},
+    {q: "Which blood component is responsible for clotting?", options: ["Red blood cells", "Platelets", "Plasma", "White blood cells"], correct: 1, page: 9, exp: "الصفائح الدموية (Platelets) مسؤولة عن تجلط الدم."},
+    {q: "The contraction phase of the cardiac cycle is called diastole.", options: ["True", "False"], correct: 1, page: 10, exp: "خطأ، الانقباض يسمى Systole، أما Diastole فهو الارتخاء."},
+    {q: "The average heart rate for a healthy adult is:", options: ["40-60 bpm", "60-100 bpm", "100-150 bpm", "20-40 bpm"], correct: 1, page: 10, exp: "المعدل الطبيعي هو من 60 إلى 100 نبضة في الدقيقة."},
+    {q: "The aorta is the largest artery in the body.", options: ["True", "False"], correct: 0, page: 11, exp: "صحيح، الشريان الأورطي هو الأكبر."},
+    {q: "Which circuit carries blood to the lungs and back to the heart?", options: ["Systemic circuit", "Pulmonary circuit", "Hepatic circuit", "Renal circuit"], correct: 1, page: 12, exp: "الدورة الرئوية (Pulmonary) هي التي تصل للرئتين."},
+    {q: "The Superior Vena Cava returns blood from the lower body.", options: ["True", "False"], correct: 1, page: 12, exp: "خطأ، الوريد الأجوف العلوي يعيد الدم من الجزء العلوي للجسم."},
+    {q: "Pulmonary veins carry oxygenated blood to the heart.", options: ["True", "False"], correct: 0, page: 12, exp: "صحيح، هي الأوردة الوحيدة التي تحمل دماً مؤكسجاً."},
+    {q: "The heart pumps how many liters of blood per minute at rest?", options: ["1 liter", "5 liters", "10 liters", "20 liters"], correct: 1, page: 2, exp: "يضخ القلب حوالي 5 لترات في الدقيقة."},
+    {q: "Which layer is the visceral layer of the serous pericardium?", options: ["Endocardium", "Epicardium", "Myocardium", "Fibrous Pericardium"], correct: 1, page: 4, exp: "الـ Epicardium هو نفسه الطبقة الحشوية من التامور."},
+    {q: "The heart functions as a double pump.", options: ["True", "False"], correct: 0, page: 3, exp: "صحيح، القلب مضخة مزدوجة (يمين ويسار)."},
+    {q: "Where is the tricuspid valve located?", options: ["Between Left Atrium/Ventricle", "Between Right Atrium/Ventricle", "At the base of Aorta", "At the base of Pulmonary artery"], correct: 1, page: 5, exp: "يقع الصمام ثلاثي الشرفات في الجانب الأيمن."},
+    {q: "Which node delays the electrical signal to allow ventricles to fill?", options: ["SA node", "AV node", "Purkinje fibers", "Bundle of His"], correct: 1, page: 6, exp: "العقدة AV تؤخر الإشارة قليلاً للسماح بامتلاء البطينين."},
+    {q: "Veins have thinner walls than arteries.", options: ["True", "False"], correct: 0, page: 7, exp: "صحيح، ضغط الدم في الأوردة أقل لذا جدرانها أرق."},
+    {q: "What keeps blood moving in one direction in veins?", options: ["High pressure", "Valves", "The heart's suction", "Gravity"], correct: 1, page: 7, exp: "الأوردة تحتوي على صمامات لمنع رجوع الدم."},
+    {q: "Platelets are also called thrombocytes.", options: ["True", "False"], correct: 0, page: 9, exp: "صحيح، هذا هو الاسم العلمي لها."},
+    {q: "Erythrocytes contain hemoglobin to transport oxygen.", options: ["True", "False"], correct: 0, page: 9, exp: "صحيح، الهيموجلوبين هو البروتين الناقل للأكسجين."},
+    {q: "The heart's sound 'lub-dub' is caused by valves closing.", options: ["True", "False"], correct: 0, page: 10, exp: "صحيح، الصوت ينتج عن إغلاق الصمامات."},
+    {q: "Systemic circulation carries blood to the entire body.", options: ["True", "False"], correct: 0, page: 11, exp: "صحيح، الدورة الجهازية تغذي الجسم بالكامل."},
+    {q: "The left ventricle has thicker walls than the right ventricle.", options: ["True", "False"], correct: 0, page: 4, exp: "صحيح، لأنه يحتاج لضخ الدم لمسافات أطول (لكل الجسم)."},
+    {q: "The cardiac cycle includes one heart beat.", options: ["True", "False"], correct: 0, page: 10, exp: "صحيح، الدورة القلبية هي نبضة واحدة كاملة."},
+    {q: "Arteries always carry oxygenated blood.", options: ["True", "False"], correct: 1, page: 12, exp: "خطأ، الشريان الرئوي يحمل دماً غير مؤكسج."},
+    {q: "Venules are small veins.", options: ["True", "False"], correct: 0, page: 7, exp: "صحيح، هي الأوعية التي تلي الشعيرات الدموية."},
+    {q: "The heart is positioned slightly to the right side of the chest.", options: ["True", "False"], correct: 1, page: 3, exp: "خطأ، يميل لليسار قليلاً."},
+    {q: "What is the middle layer of the heart wall?", options: ["Epicardium", "Myocardium", "Endocardium", "Pericardium"], correct: 1, page: 4, exp: "الميوكارديوم (Myocardium) هي الطبقة الوسطى."},
+    {q: "White blood cells are fewer in number than red blood cells.", options: ["True", "False"], correct: 0, page: 9, exp: "صحيح، خلايا الدم الحمراء هي الأكثر عدداً بكثير."},
+    {q: "Blood helps regulate body temperature.", options: ["True", "False"], correct: 0, page: 2, exp: "صحيح، إحدى وظائف الجهاز الوعائي هي التنظيم الحراري."},
+    {q: "The endocardium is composed of simple squamous epithelium.", options: ["True", "False"], correct: 0, page: 4, exp: "صحيح، هي طبقة رقيقة تبطن القلب من الداخل."},
+    {q: "The Inferior Vena Cava carries blood from the head.", options: ["True", "False"], correct: 1, page: 12, exp: "خطأ، الوريد الأجوف السفلي يحمل الدم من أسفل الحجاب الحاجز."},
+    {q: "Heart rate increases during exercise.", options: ["True", "False"], correct: 0, page: 15, exp: "صحيح، لتلبية احتياجات الجسم المتزايدة للأكسجين."},
+    {q: "Purkinje fibers spread the impulse through the ventricles.", options: ["True", "False"], correct: 0, page: 6, exp: "صحيح، هي المسؤولة عن نقل الإشارة لجدران البطينين."},
+    {q: "Blood volume in an average adult is about 5-6 liters.", options: ["True", "False"], correct: 0, page: 8, exp: "صحيح، هذا هو الحجم التقريبي للدم."},
+    {q: "Which chamber of the heart has the highest pressure?", options: ["Right Atrium", "Right Ventricle", "Left Atrium", "Left Ventricle"], correct: 3, page: 4, exp: "البطين الأيسر هو صاحب أعلى ضغط لأنه يضخ للجسم كله."},
+    {q: "The heart is a vital organ.", options: ["True", "False"], correct: 0, page: 2, exp: "صحيح، بدونه لا يمكن للجسم البقاء على قيد الحياة."},
+    {q: "Semilunar valves are located at the base of large arteries.", options: ["True", "False"], correct: 0, page: 5, exp: "صحيح، الصمامات الهلالية توجد عند مداخل الشرايين الكبرى."},
+    {q: "Blood is a type of connective tissue.", options: ["True", "False"], correct: 0, page: 8, exp: "صحيح، الدم يعتبر نسيجاً ضاماً سائلاً."}
+];
+
+let shuffled = [];
+let currentIndex = 0;
+let score = 0;
+
+function startQuiz() {
+    shuffled = questions.sort(() => Math.random() - 0.5);
+    loadQuestion();
+}
+
+function loadQuestion() {
+    const qData = shuffled[currentIndex];
+    document.getElementById('q-num').innerText = currentIndex + 1;
+    document.getElementById('q-text').innerText = qData.q;
+    document.getElementById('feedback').style.display = 'none';
+    document.getElementById('next-btn').style.display = 'none';
+    
+    const optionsEl = document.getElementById('options');
+    optionsEl.innerHTML = '';
+    
+    qData.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(i, btn);
+        optionsEl.appendChild(btn);
+    });
+}
+
+function checkAnswer(idx, btn) {
+    const qData = shuffled[currentIndex];
+    const btns = document.querySelectorAll('.option-btn');
+    btns.forEach(b => b.disabled = true);
+    
+    const feedback = document.getElementById('feedback');
+    feedback.style.display = 'block';
+    
+    if(idx === qData.correct) {
+        btn.classList.add('correct');
+        score++;
+        document.getElementById('score').innerText = score;
+        feedback.className = 'feedback correct';
+        feedback.innerHTML = `<strong>إجابة صحيحة!</strong><br>المصدر: صفحة ${qData.page}`;
+    } else {
+        btn.classList.add('wrong');
+        btns[qData.correct].classList.add('correct');
+        feedback.className = 'feedback wrong';
+        feedback.innerHTML = `<strong>إجابة خاطئة</strong><br>${qData.exp}<br>المصدر: صفحة ${qData.page}`;
+    }
+    document.getElementById('next-btn').style.display = 'block';
+}
+
+function nextQuestion() {
+    currentIndex++;
+    if(currentIndex < shuffled.length) {
+        loadQuestion();
+    } else {
+        document.getElementById('quiz-area').innerHTML = `<h2>انتهى الاختبار!</h2><p>نتيجتك النهائية: ${score} من 50</p><button class="next-btn" style="display:block" onclick="location.reload()">إعادة الاختبار</button>`;
+    }
+}
+
+startQuiz();
+</script>
+</body>
+</html>
