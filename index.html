@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة الاختبارات الطبية</title>
+    <style>
+        :root {
+            --pink-bright: #ff75c3;
+            --purple-light: #a29bfe;
+            --purple-dark: #6c5ce7;
+            --white: #ffffff;
+            --bg-gradient: linear-gradient(135deg, #ff75c3 0%, #9b51e0 100%);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #444;
+        }
+
+        /* حاوية الموقع الرئيسي */
+        .main-wrapper {
+            width: 90%;
+            max-width: 900px;
+            text-align: center;
+        }
+
+        .site-title {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* قائمة الاختيارات */
+        .selection-grid {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        /* بطاقة الملف */
+        .quiz-card {
+            background: var(--white);
+            border-radius: 30px;
+            padding: 40px 30px;
+            width: 320px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .quiz-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+        }
+
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            background: var(--bg-gradient);
+            border-radius: 20px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 2.5rem;
+        }
+
+        .quiz-card h2 {
+            margin: 10px 0;
+            color: var(--purple-dark);
+            font-size: 1.5rem;
+        }
+
+        .quiz-card p {
+            font-size: 0.95rem;
+            color: #777;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        /* زر البدء */
+        .start-btn {
+            background: var(--bg-gradient);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .start-btn:hover {
+            opacity: 0.9;
+        }
+
+        .badge {
+            background: #ffecf5;
+            color: #ff75c3;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        <h1 class="site-title">مرحباً بك في منصة الاختبارات الذكية</h1>
+        
+        <div class="selection-grid">
+            <div class="quiz-card">
+                <div class="badge">ملف PDF متوفر</div>
+                <div class="icon-box">🫀</div>
+                <h2>Anatomy Quiz</h2>
+                <p>اختبار شامل لجهاز الدوران (Cardiovascular System) مستخرج من الملف التعليمي الخاص بك.</p>
+                <p style="font-weight: bold; color: var(--pink-bright);">50 سؤال • باللغة الإنجليزية</p>
+                
+                <button class="start-btn" onclick="openQuiz()">ابدأ الاختبار الآن</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openQuiz() {
+            // هنا يمكنك وضع الرابط لملف الاختبار الآخر أو تبديل الواجهة برمجياً
+            alert("سيتم نقلك الآن إلى اختبار Anatomy Quiz المكون من 50 سؤالاً.");
+            
+            // ملاحظة: إذا كان كود الاختبار في صفحة منفصلة استخدم:
+            // window.location.href = "quiz_page.html";
+        }
+    </script>
+
+</body>
+</html>
